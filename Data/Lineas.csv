@@ -1,2 +1,4 @@
 Num de Linea;Municipio origen;Municipio destino;Hora inicial de salida;Intervalo de buses
-100;Badalona;Barcelona;10:10;60:00
+1;Badalona;Barcelona;10:10;60:00
+2;Lugo;Vigo;23:00;24:00
+3;Oviedo;Valencia;12:00;13:00
