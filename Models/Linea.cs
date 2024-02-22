@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -11,7 +12,7 @@ namespace Actividad2EV.Models
         public Linea()
         {
         }
-        public Linea(int id, string municipioOr, string municipioDest, DateTime horaInic, DateTime intervaloBus)
+        public Linea(int id, string municipioOr, string municipioDest, string horaInic, string intervaloBus)
         {
             Id = id;
             MunicipioOr = municipioOr;
@@ -19,11 +20,16 @@ namespace Actividad2EV.Models
             HoraInic = horaInic;
             IntervaloBus = intervaloBus;
         }
+        [DisplayName("Número de Linea")]
         public int Id { get; set; }
+        [DisplayName("Municipio Origen")]
         public string MunicipioOr { get; set; }
+        [DisplayName("Municipio Destino")]
         public string MunicipioDest { get; set; }
-        public DateTime HoraInic {  get; set; }
-        public DateTime IntervaloBus { get; set; } 
+        [DisplayName("Hora Inicial de salida")]
+        public string HoraInic {  get; set; }
+        [DisplayName("Intervalo de buses")]
+        public string IntervaloBus { get; set; } 
 
         public override bool Equals(object? obj)
         {

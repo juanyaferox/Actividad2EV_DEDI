@@ -7,7 +7,7 @@
         mc:Ignorable="d"
         Title="MainWindow"
         MinWidth="822" MaxWidth="822" 
-        MinHeight="478" MaxHeight="478">
+        MinHeight="520" MaxHeight="520">
     <Window.Resources>
         <ResourceDictionary>
             <Style x:Key="margenes" TargetType="{x:Type Button}">
@@ -15,42 +15,53 @@
                 <Setter Property="FontSize" Value="20" />
                 <Setter Property="HorizontalContentAlignment" Value="Center"/>
                 <Setter Property="VerticalContentAlignment" Value="Center"/>
-
             </Style>
         </ResourceDictionary>
     </Window.Resources>
-    <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="3*"/>
-            <ColumnDefinition Width="77*"/>
-        </Grid.ColumnDefinitions>
-        <Grid HorizontalAlignment="Left" Height="452" VerticalAlignment="Top" Width="525" Margin="0,10,0,0" Grid.ColumnSpan="2">
-            <DataGrid x:Name="dataGrid" AutoGenerateColumns="True" IsReadOnly="False" Margin="10,0,0,72"/>
-            <!--SelectionChanged="dataGrid_SelectionChanged" LostFocus="dataGrid_LostFocus"-->
-        </Grid>
-        <Grid Margin="494,0,0,255" Grid.Column="1">
+    <DockPanel>
+        <ToolBar DockPanel.Dock="Top" Height="26" Background="{x:Null}" HorizontalAlignment="Right">
+            <Button Content="F1 - Ayuda" HorizontalAlignment="Right" Click="btnAyuda_Click"/>
+        </ToolBar>
+        <Grid>
+
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="3*"/>
+                <ColumnDefinition Width="77*"/>
             </Grid.ColumnDefinitions>
-            <Button x:Name="btnLineas" Grid.Column="0" Style="{StaticResource margenes}" Content=" GESTIÓN&#xA;DE LINEAS" Click="btnLineas_Click" />
-            <Button x:Name="btnItiner" Grid.Column="1" Style="{StaticResource margenes}" Content="GESTIÓN DE&#xA;ITINERARIOS" Click="btnItin_Click" ScrollViewer.VerticalScrollBarVisibility="Disabled"/>
+            <Grid HorizontalAlignment="Left" Height="386" VerticalAlignment="Top" Width="525" Margin="0,-5,0,0" Grid.ColumnSpan="2">
+                <DataGrid x:Name="dataGrid" AutoGenerateColumns="True" CanUserAddRows="False" IsReadOnly="True" PreparingCellForEdit="dataGrid_PreparingCellForEdit" AutoGeneratingColumn="OnAutoGeneratingColumn" BeginningEdit="dataGrid_BeginningEdit" Margin="10,-15,0,0"/>
+                <!--SelectionChanged="dataGrid_SelectionChanged" LostFocus="dataGrid_LostFocus"-->
+            </Grid>
+            <Grid Margin="494,0,0,255" Grid.Column="1">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <Button x:Name="btnLineas" Grid.Column="0" Style="{StaticResource margenes}" Content=" GESTIÓN&#xA;DE LINEAS" Click="btnLineas_Click" />
+                <Button x:Name="btnItiner" Grid.Column="1" Style="{StaticResource margenes}" Content="GESTIÓN DE&#xA;ITINERARIOS" Click="btnItin_Click" ScrollViewer.VerticalScrollBarVisibility="Disabled"/>
+            </Grid>
+            <Grid Margin="494,230,0,0" Grid.Column="1">
+                <Grid.RowDefinitions>
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                </Grid.RowDefinitions>
+                <Button x:Name="btnAlta" Grid.Row="0" Style="{StaticResource margenes}" Content="ALTA" Click="btnAlta_Click"/>
+                <Button x:Name="btnBaja" Grid.Row="1" Style="{StaticResource margenes}" Content="BAJA" Click="btnBaja_Click"/>
+                <Button x:Name="btnModificar" Grid.Row="2" Style="{StaticResource margenes}" Content="MODIFICAR" Click="btnModificar_Click" Margin="10,10,10,10"/>
+            </Grid>
+            <Grid Margin="491,179,0,204" Grid.Column="1" >
+                <Label Content="Programa de Gestión AVILESA" FontSize="20" Width="302" HorizontalAlignment="Center" VerticalAlignment="Center" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Padding="0,0,0,0"/>
+            </Grid>
+            <Grid Margin="0,381,297,0" Grid.ColumnSpan="2">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <Button x:Name="btnRefres" Grid.Column="0" Content="REFRESCAR" Style="{StaticResource margenes}" Margin="10,10,10,10" Click="btnRefres_Click"/>
+                <Button x:Name="btnConf" Grid.Column="1" Content="CONFIRMAR CAMBIOS" Style="{StaticResource margenes}" Margin="10,10,-15,10"/>
+            </Grid>
+
         </Grid>
-        <Grid Margin="494,230,0,0" Grid.Column="1">
-            <Grid.RowDefinitions>
-                <RowDefinition />
-                <RowDefinition />
-                <RowDefinition />
-            </Grid.RowDefinitions>
-            <Button x:Name="btnAlta" Grid.Row="0" Style="{StaticResource margenes}" Content="ALTA" Click="btnAlta_Click"/>
-            <Button x:Name="btnBaja" Grid.Row="1" Style="{StaticResource margenes}" Content="BAJA" Click="btnBaja_Click"/>
-            <Button x:Name="btnModificar" Grid.Row="2" Style="{StaticResource margenes}" Content="MODIFICAR" Click="btnModificar_Click" Margin="10,10,10,10"/>
-        </Grid>
-        <Grid Margin="491,179,0,204" Grid.Column="1" >
-            <Label Content="Programa de Gestión AVILESA" FontSize="20" Width="302" HorizontalAlignment="Center" VerticalAlignment="Center" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Padding="0,0,0,0"/>
-        </Grid>
-        <Grid Margin="0,389,297,0" Grid.ColumnSpan="2">
-            <Button x:Name="btnRefres" Content="REFRESCAR" Style="{StaticResource margenes}" Margin="10,10,-15,10" Click="btnRefres_Click"/>
-        </Grid>
-    </Grid>
+    </DockPanel>
 </Window>

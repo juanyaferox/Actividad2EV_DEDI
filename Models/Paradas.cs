@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -12,16 +13,18 @@ namespace Actividad2EV.Models
         {
         }
 
-        public Paradas(int numLinea, string municipio, DateTime intervaloHS)
+        public Paradas(int numLinea, string municipio, string intervaloHS)
         {
             NumLinea = numLinea;
             Municipio = municipio;
             IntervaloHS = intervaloHS;
         }
-
+        [DisplayName("Número de Linea")]
         public int NumLinea { get; set; }
-        public String Municipio { get; set; }
-        public DateTime IntervaloHS { get; set; }
+        [DisplayName("Municipio")]
+        public string Municipio { get; set; }
+        [DisplayName("Intervalos desde la hora de salida")]
+        public string IntervaloHS { get; set; }
 
         public override bool Equals(object? obj)
         {
