@@ -1,20 +1,13 @@
 ﻿using Actividad2EV.Models;
 using Microsoft.VisualBasic.FileIO;
-using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Data;
 using System.IO;
 using System.Reflection;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
+
 
 namespace Actividad2EV
 {
@@ -23,11 +16,16 @@ namespace Actividad2EV
     /// </summary>
     public partial class MainWindow : Window
     {
-        Boolean esLineas = false;
-        Boolean esItin = false;
+        Boolean esLineas;
+        Boolean esItin;
         string proyectoDirectorio;
         string filePathL;
         string filePathI;
+        List<object> dataList = new List<object>();
+        List<object> backupListL = new List<object>();
+        List<object> backupListP = new List<object>();
+        Boolean backupL;
+        Boolean backupP;
         public MainWindow()
         {
             InitializeComponent();
@@ -44,19 +42,66 @@ namespace Actividad2EV
                 VentanaAyuda();
             }
         }
+        //no es coña q el tema d botones fue lo más dolor d cabeza me dió
         private void btnLineas_Click(object sender, RoutedEventArgs e)
         {
+            if (esLineas)
+            {
+                return;
+            } if (esItin)
+            {
+
+                backupListP = dataList.ToList();
+                backupP = true;
+                
+                //MessageBox.Show("Respaldo paradas\n" + string.Join(", ", backupListP));
+            }
             esLineas = true;
             esItin = false;
-            FillDataGridCSV(filePathL);
-            
+            if (backupL)
+            {
+
+                dataGrid.ItemsSource = null;
+                dataGrid.ItemsSource = backupListL;
+                backupL = false;
+                //MessageBox.Show("Estás en bkacupL:\n"+ string.Join(", ", backupListL));
+            }
+            else
+            {
+                FillDataGridCSV(filePathL);
+
+            }
+
         }
         private void btnItin_Click(object sender, RoutedEventArgs e)
         {
+            if (esItin)
+            {
+                return;
+            }
+            if (esLineas)
+            {
+                backupListL = dataList.ToList();
+                backupL = true;
+                //MessageBox.Show("Respaldo lista:\n" + string.Join(", ", backupListL));
+            }
             esItin = true;
             esLineas = false;
-            FillDataGridCSV(filePathI);
-            
+            if (backupP)
+            {
+
+                dataGrid.ItemsSource = null;
+                dataGrid.ItemsSource = backupListP;
+                
+                backupP = false;
+                //MessageBox.Show("Estás en bkacupP:\n" + string.Join(", ", backupListP));
+            }
+            else
+            {
+                FillDataGridCSV(filePathI);
+
+            }
+
         }
 
         private void FillDataGridCSV(string filePath)
@@ -66,32 +111,37 @@ namespace Actividad2EV
                 MessageBox.Show("El archivo CSV no se encontró en la carpeta.");
                 return;
             }
-
-            List<object> dataList = new List<object>();
-
+            dataList.Clear();
+            
             using (TextFieldParser parser = new TextFieldParser(filePath))
             {
                 parser.TextFieldType = FieldType.Delimited;
                 parser.SetDelimiters(";");
-
-                // Descarta las primeras líneas al ser cabeceras
+                
                 parser.ReadLine();
 
                 while (!parser.EndOfData)
                 {
                     string[] fields = parser.ReadFields();
-
+                    
                     if (esLineas && !esItin)
                     {
                         AddLineaToList(fields, dataList);
+                        
+                        
+
                     }
                     else if (!esLineas && esItin)
                     {
                         AddParadasToList(fields, dataList);
+                        
+                        
                     }
                 }
             }
+            dataGrid.ItemsSource = null;
             dataGrid.ItemsSource = dataList;
+            //MessageBox.Show("Este es el data list:\n" + string.Join(", ", dataList));
         }
         private void AddLineaToList(string[] fields, List<object> dataList)
         {
@@ -150,7 +200,71 @@ namespace Actividad2EV
             dataGrid.CanUserAddRows = false;
             dataGrid.IsReadOnly = false;
             dataGrid.BeginningEdit -= dataGrid_BeginningEdit;
+
         }
+        private void dataGrid_CellEditEnding(object sender, DataGridCellEditEndingEventArgs e)
+        {
+            int columnIndex = e.Column.DisplayIndex;
+            TextBox editedTextBox = e.EditingElement as TextBox;
+            string newValue = editedTextBox.Text;
+            object editedObject = e.Row.Item;
+            
+
+            if (esLineas)
+            {
+                Linea editedLinea = editedObject as Linea;
+                if (editedLinea != null)
+                {
+                    switch (columnIndex)
+                    {
+                        case 1:
+                            editedLinea.MunicipioOr = newValue;
+                            break;
+                        case 2:
+                            editedLinea.MunicipioDest = newValue;
+                            break;
+                        case 3:
+                            editedLinea.HoraInic = newValue;
+                            break;
+                        case 4:
+                            editedLinea.IntervaloBus = newValue;
+                            break;
+                    }
+                    int index = dataList.IndexOf(editedLinea);
+                    if (index != -1)
+                    {
+                        dataList[index] = editedLinea;
+                    }
+                }
+            }
+            else if (esItin)
+            {
+                Paradas editedLinea = editedObject as Paradas;
+                if (editedLinea != null)
+                {
+                    switch (columnIndex)
+                    {
+                        case 0:
+                            editedLinea.NumLinea = int.Parse(newValue);
+                            break;
+                        case 1:
+                            editedLinea.Municipio = newValue;
+                            break;
+                        case 2:
+                            editedLinea.IntervaloHS = newValue;
+                            break;
+                    }
+                    int index = dataList.IndexOf(editedLinea);
+                    if (index != -1)
+                    {
+                        dataList[index] = editedLinea;
+                    }
+                }
+            }
+        }
+        
+
+
         private void EliminarFilaSeleccionada()
         {
             if (esLineas)
@@ -246,19 +360,17 @@ namespace Actividad2EV
         }
         private void dataGrid_BeginningEdit(object sender, DataGridBeginningEditEventArgs e)
         {
-            // Verifica si la edición se está realizando en una fila existente
+            
             if (e.Row != null && !e.Row.IsNewItem)
             {
-                // Cancela la edición
+               
                 e.Cancel = true;
             }
         }
         private void dataGrid_PreparingCellForEdit(object sender, DataGridPreparingCellForEditEventArgs e)
         {
-            // Verifica si la celda pertenece a la primera columna
             if (e.Column != null && e.Column.DisplayIndex == 0)
             {
-                // Accede a la celda y establece IsReadOnly en true para la primera columna
                 DataGridCell cell = e.Column.GetCellContent(e.Row).Parent as DataGridCell;
                 if (cell != null)
                 {
@@ -279,5 +391,63 @@ namespace Actividad2EV
         {
             VentanaAyuda();
         }
+
+        private void btnConf_Click(object sender, RoutedEventArgs e)
+        {
+            MessageBoxResult result = MessageBox.Show("¿Estás seguro de realizar esta acción?", "Confirmación", MessageBoxButton.OKCancel);
+            if (result == MessageBoxResult.OK)
+            {
+                if (esLineas)
+                {
+                    List<object> lineasList = new List<object>();
+                    foreach (Linea linea in dataGrid.Items)
+                    {
+                        lineasList.Add(linea);
+                    }
+                    SaveListToCSV(lineasList, filePathL);
+                    MessageBox.Show("Realiado con éxito");
+                }
+                else if (esItin)
+                {
+                    List<object> paradasList = new List<object>();
+                    foreach (Paradas parada in dataGrid.Items)
+                    {
+                        paradasList.Add(parada);
+                    }
+                    SaveListToCSV(paradasList, filePathI);
+                    MessageBox.Show("Realiado con éxito");
+                }
+            }
+        }
+        public void SaveListToCSV(List<object> dataList, string filePath)
+        {
+            // Crear un StringBuilder para construir el contenido del archivo CSV
+            StringBuilder csvContent = new StringBuilder();
+
+            // Obtener las propiedades del primer objeto en la lista
+            var firstItem = dataList.FirstOrDefault();
+            if (firstItem != null)
+            {
+                var properties = firstItem.GetType().GetProperties();
+
+                // Obtener los nombres de las propiedades y escribirlos como encabezados en la primera línea del CSV
+                var headers = string.Join(";", properties.Select(p => p.Name));
+                csvContent.AppendLine(headers);
+
+                // Iterar sobre cada elemento de la lista y agregar sus valores al contenido CSV
+                foreach (var item in dataList)
+                {
+                    // Obtener los valores de las propiedades del objeto y unirlos con punto y coma (;)
+                    var values = string.Join(";", properties.Select(p => p.GetValue(item)?.ToString() ?? ""));
+
+                    // Agregar los valores al contenido CSV con un salto de línea al final
+                    csvContent.AppendLine(values);
+                }
+            }
+
+            // Escribir el contenido del archivo CSV en el archivo especificado
+            File.WriteAllText(filePath, csvContent.ToString());
+        }
+
     }
 }

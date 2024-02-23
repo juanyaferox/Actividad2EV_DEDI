@@ -19,6 +19,7 @@ namespace Actividad2EV.Models
             Municipio = municipio;
             IntervaloHS = intervaloHS;
         }
+
         [DisplayName("Número de Linea")]
         public int NumLinea { get; set; }
         [DisplayName("Municipio")]
@@ -37,6 +38,11 @@ namespace Actividad2EV.Models
         public override int GetHashCode()
         {
             return HashCode.Combine(NumLinea, Municipio, IntervaloHS);
+        }
+
+        public override string ToString()
+        {
+            return $"{nameof(NumLinea)}: {NumLinea}, {nameof(Municipio)}: {Municipio}, {nameof(IntervaloHS)}: {IntervaloHS}";
         }
     }
 

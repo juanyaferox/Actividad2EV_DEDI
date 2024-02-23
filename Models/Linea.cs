@@ -20,15 +20,15 @@ namespace Actividad2EV.Models
             HoraInic = horaInic;
             IntervaloBus = intervaloBus;
         }
-        [DisplayName("Número de Linea")]
+        [DisplayName("Núm de Linea")]
         public int Id { get; set; }
         [DisplayName("Municipio Origen")]
         public string MunicipioOr { get; set; }
         [DisplayName("Municipio Destino")]
         public string MunicipioDest { get; set; }
-        [DisplayName("Hora Inicial de salida")]
+        [DisplayName("Hora inicial de salida")]
         public string HoraInic {  get; set; }
-        [DisplayName("Intervalo de buses")]
+        [DisplayName("Intervalo buses")]
         public string IntervaloBus { get; set; } 
 
         public override bool Equals(object? obj)
@@ -45,5 +45,11 @@ namespace Actividad2EV.Models
         {
             return HashCode.Combine(Id, MunicipioOr, MunicipioDest, HoraInic, IntervaloBus);
         }
+
+        public override string ToString()
+        {
+            return $"{nameof(Id)}: {Id}, {nameof(MunicipioOr)}: {MunicipioOr}, {nameof(MunicipioDest)}: {MunicipioDest}, {nameof(HoraInic)}: {HoraInic}, {nameof(IntervaloBus)}: {IntervaloBus}";
+        }
+
     }
 }
