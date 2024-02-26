@@ -29,7 +29,7 @@
                 <ColumnDefinition Width="77*"/>
             </Grid.ColumnDefinitions>
             <Grid HorizontalAlignment="Left" Height="386" VerticalAlignment="Top" Width="525" Margin="0,-5,0,0" Grid.ColumnSpan="2">
-                <DataGrid x:Name="dataGrid" AutoGenerateColumns="True" CanUserAddRows="False" IsReadOnly="True"
+                <DataGrid x:Name="dataGrid" AutoGenerateColumns="True" CanUserAddRows="False" IsReadOnly="True" AddingNewItem="dataGrid_AddingNewItem"
                           PreparingCellForEdit="dataGrid_PreparingCellForEdit" AutoGeneratingColumn="OnAutoGeneratingColumn" 
                           BeginningEdit="dataGrid_BeginningEdit" Margin="10,-15,0,0" CellEditEnding="dataGrid_CellEditEnding"/>
             </Grid>

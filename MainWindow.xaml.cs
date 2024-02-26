@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.IO;
 using System.Reflection;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -16,23 +17,33 @@ namespace Actividad2EV
     /// </summary>
     public partial class MainWindow : Window
     {
-        Boolean esLineas;
-        Boolean esItin;
+        bool esLineas;
+        bool esItin;
+        bool alta;
+        bool baja;
+        bool mod;
         string proyectoDirectorio;
         string filePathL;
         string filePathI;
-        List<object> dataList = new List<object>();
-        List<object> backupListL = new List<object>();
-        List<object> backupListP = new List<object>();
-        Boolean backupL;
-        Boolean backupP;
+        string filePathM;
+        List<object> dataListLinea = new List<object>();
+        List<object> dataListParada = new List<object>();
         public MainWindow()
         {
             InitializeComponent();
             proyectoDirectorio = Directory.GetParent(Environment.CurrentDirectory).Parent.Parent.FullName;
             filePathL = System.IO.Path.Combine(proyectoDirectorio, "Data", "Lineas.csv");
             filePathI = System.IO.Path.Combine(proyectoDirectorio, "Data", "Paradas.csv");
+            filePathM = System.IO.Path.Combine(proyectoDirectorio, "Data", "Municipios .csv");
             PreviewKeyDown += MainWindow_PreviewKeyDown;
+            esLineas = true;
+            FillDataGridCSV(filePathL);
+            esItin = true;
+            esLineas = false;
+            FillDataGridCSV(filePathI);
+            esItin = false;
+            //un poco liada aqui, pero es q al principio hice un solo metodo que me rellenase una misma lista y la fuera borrando cuando accedia al otro
+            //y para no volver a remodelar hice esta aberración
         }
         private void MainWindow_PreviewKeyDown(object sender, KeyEventArgs e)
         {
@@ -48,29 +59,18 @@ namespace Actividad2EV
             if (esLineas)
             {
                 return;
-            } if (esItin)
-            {
-
-                backupListP = dataList.ToList();
-                backupP = true;
-                
-                //MessageBox.Show("Respaldo paradas\n" + string.Join(", ", backupListP));
             }
             esLineas = true;
             esItin = false;
-            if (backupL)
+            if (mod)
             {
-
-                dataGrid.ItemsSource = null;
-                dataGrid.ItemsSource = backupListL;
-                backupL = false;
-                //MessageBox.Show("Estás en bkacupL:\n"+ string.Join(", ", backupListL));
-            }
-            else
+                dataGrid.PreparingCellForEdit += dataGrid_PreparingCellForEdit;
+            } else if (alta)
             {
-                FillDataGridCSV(filePathL);
-
+                dataGrid.PreparingCellForEdit += dataGrid_PreparingCellForEdit;
             }
+            dataGrid.ItemsSource = null;
+            dataGrid.ItemsSource = dataListLinea;
 
         }
         private void btnItin_Click(object sender, RoutedEventArgs e)
@@ -79,31 +79,72 @@ namespace Actividad2EV
             {
                 return;
             }
-            if (esLineas)
-            {
-                backupListL = dataList.ToList();
-                backupL = true;
-                //MessageBox.Show("Respaldo lista:\n" + string.Join(", ", backupListL));
-            }
             esItin = true;
             esLineas = false;
-            if (backupP)
+            if (mod)
             {
+                dataGrid.PreparingCellForEdit -= dataGrid_PreparingCellForEdit;
+            } else if (alta)
+            {
+                dataGrid.PreparingCellForEdit -= dataGrid_PreparingCellForEdit;
+            }
+            dataGrid.ItemsSource = null;
+                dataGrid.ItemsSource = dataListParada;
+        }
 
-                dataGrid.ItemsSource = null;
-                dataGrid.ItemsSource = backupListP;
-                
-                backupP = false;
-                //MessageBox.Show("Estás en bkacupP:\n" + string.Join(", ", backupListP));
+
+        private void btnAlta_Click(object sender, RoutedEventArgs e)
+        {
+            alta = true;
+            baja = false;
+            mod = false;
+            dataGrid.CanUserAddRows = true;
+            dataGrid.IsReadOnly = false;
+            dataGrid.BeginningEdit += dataGrid_BeginningEdit;
+            if (esItin)
+            {
+                dataGrid.PreparingCellForEdit -= dataGrid_PreparingCellForEdit;
             }
             else
             {
-                FillDataGridCSV(filePathI);
-
+                dataGrid.PreparingCellForEdit += dataGrid_PreparingCellForEdit;
             }
-
         }
 
+            private void btnBaja_Click(object sender, RoutedEventArgs e)
+        {
+            alta = false;
+            baja = true;
+            mod = false;
+            try
+            {
+                EliminarFilaSeleccionada();
+            }
+            catch (InvalidCastException ex)
+            {
+                ex.Data.Add("MensajeAdicional", "Hiciste algo ilegal amigo");
+            }
+            dataGrid.IsReadOnly = true;
+        }
+
+        private void btnModificar_Click(object sender, RoutedEventArgs e)
+        {
+            alta = false;
+            baja = false;
+            mod = true;
+            dataGrid.CanUserAddRows = false;
+            dataGrid.IsReadOnly = false;
+            dataGrid.BeginningEdit -= dataGrid_BeginningEdit;
+            if (esItin)
+            {
+                dataGrid.PreparingCellForEdit -= dataGrid_PreparingCellForEdit;
+            } else
+            {
+                dataGrid.PreparingCellForEdit += dataGrid_PreparingCellForEdit;
+            }
+            
+
+        }
         private void FillDataGridCSV(string filePath)
         {
             if (!File.Exists(filePath))
@@ -111,48 +152,38 @@ namespace Actividad2EV
                 MessageBox.Show("El archivo CSV no se encontró en la carpeta.");
                 return;
             }
-            dataList.Clear();
-            
             using (TextFieldParser parser = new TextFieldParser(filePath))
             {
                 parser.TextFieldType = FieldType.Delimited;
                 parser.SetDelimiters(";");
-                
+
                 parser.ReadLine();
 
                 while (!parser.EndOfData)
                 {
                     string[] fields = parser.ReadFields();
-                    
+
                     if (esLineas && !esItin)
                     {
-                        AddLineaToList(fields, dataList);
-                        
-                        
-
+                        AddLineaToList(fields, dataListLinea);
                     }
                     else if (!esLineas && esItin)
                     {
-                        AddParadasToList(fields, dataList);
-                        
-                        
+                        AddParadasToList(fields, dataListParada);
                     }
                 }
             }
-            dataGrid.ItemsSource = null;
-            dataGrid.ItemsSource = dataList;
-            //MessageBox.Show("Este es el data list:\n" + string.Join(", ", dataList));
         }
-        private void AddLineaToList(string[] fields, List<object> dataList)
+        private void AddLineaToList(string[] fields, List<object> dataListLinea)
         {
             Linea linea = ConstruirLineaDesdeCSV(fields);
-            dataList.Add(linea);
+            dataListLinea.Add(linea);
         }
 
-        private void AddParadasToList(string[] fields, List<object> dataList)
+        private void AddParadasToList(string[] fields, List<object> dataListParada)
         {
             Paradas paradas = ConstruirParadasDesdeCSV(fields);
-            dataList.Add(paradas);
+            dataListParada.Add(paradas);
         }
         private Linea ConstruirLineaDesdeCSV(string[] fields)
         {
@@ -175,33 +206,6 @@ namespace Actividad2EV
                 IntervaloHS = fields[2]
             };
         }
-        private void btnAlta_Click(object sender, RoutedEventArgs e)
-        {
-            dataGrid.CanUserAddRows = true;
-            dataGrid.IsReadOnly = false;
-            dataGrid.BeginningEdit += dataGrid_BeginningEdit;
-        }
-
-        private void btnBaja_Click(object sender, RoutedEventArgs e)
-        {
-            try
-            {
-                EliminarFilaSeleccionada();
-            }
-            catch (InvalidCastException ex)
-            {
-                ex.Data.Add("MensajeAdicional", "Hiciste algo ilegal amigo");
-            }
-            dataGrid.IsReadOnly = true;
-        }
-
-        private void btnModificar_Click(object sender, RoutedEventArgs e)
-        {
-            dataGrid.CanUserAddRows = false;
-            dataGrid.IsReadOnly = false;
-            dataGrid.BeginningEdit -= dataGrid_BeginningEdit;
-
-        }
         private void dataGrid_CellEditEnding(object sender, DataGridCellEditEndingEventArgs e)
         {
             int columnIndex = e.Column.DisplayIndex;
@@ -213,27 +217,66 @@ namespace Actividad2EV
             if (esLineas)
             {
                 Linea editedLinea = editedObject as Linea;
+                bool coincide = VerificarCoincidenciaCSV(filePathM, newValue);
+                bool esFormatoValido = VerificarFormatoHora(newValue);
                 if (editedLinea != null)
                 {
                     switch (columnIndex)
                     {
+
                         case 1:
-                            editedLinea.MunicipioOr = newValue;
-                            break;
+                            if (coincide)
+                            {
+                                editedLinea.MunicipioOr = newValue;
+                                break;
+                            }
+                            else
+                            {
+                                MessageBox.Show("Error: No es un municipio válido.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                                e.Cancel = true;
+                                return;
+                            }
                         case 2:
-                            editedLinea.MunicipioDest = newValue;
-                            break;
+                            if (coincide)
+                            {
+                                editedLinea.MunicipioDest = newValue;
+                                break;
+                            }
+                            else
+                            {
+                                MessageBox.Show("Error: No es un municipio válido.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                                e.Cancel = true;
+                                return;
+                            }
                         case 3:
-                            editedLinea.HoraInic = newValue;
-                            break;
+                            
+                            if (esFormatoValido)
+                            {
+                                editedLinea.HoraInic = newValue;
+                                break;
+                            } else
+                            {
+                                MessageBox.Show("Error: El valor introducido no se trata de una hora.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                                e.Cancel = true;
+                                return;
+                            }
                         case 4:
-                            editedLinea.IntervaloBus = newValue;
-                            break;
+                            if (esFormatoValido)
+                            {
+                                editedLinea.IntervaloBus = newValue;
+                                break;
+                            }
+                            else
+                            {
+                                MessageBox.Show("Error: El valor introducido no se trata de una hora.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                                e.Cancel = true;
+                                return;
+                            }
                     }
-                    int index = dataList.IndexOf(editedLinea);
+                    int index = dataListLinea.IndexOf(editedLinea);
                     if (index != -1)
                     {
-                        dataList[index] = editedLinea;
+                        dataListLinea[index] = editedLinea;
                     }
                 }
             }
@@ -245,24 +288,71 @@ namespace Actividad2EV
                     switch (columnIndex)
                     {
                         case 0:
-                            editedLinea.NumLinea = int.Parse(newValue);
+                            try
+                            {
+                                editedLinea.NumLinea = int.Parse(newValue);
+                            }
+                            catch (FormatException)
+                            {
+                                MessageBox.Show("Error: El valor introducido no se trata de un número entero.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                                e.Cancel = true;
+                                return;
+                            }
                             break;
                         case 1:
-                            editedLinea.Municipio = newValue;
-                            break;
+                            bool coincide = VerificarCoincidenciaCSV(filePathM, newValue);
+                            if (coincide)
+                            {
+                                editedLinea.Municipio = newValue;
+                                break;
+                            } else
+                            {
+                                MessageBox.Show("Error: No es un municipio válido.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                                e.Cancel = true;
+                                return;
+                            }
+                            
                         case 2:
-                            editedLinea.IntervaloHS = newValue;
-                            break;
+                            bool esFormatoValido = VerificarFormatoHora(newValue);
+                            if (esFormatoValido)
+                            {
+                                editedLinea.IntervaloHS = newValue;
+                                break;
+                            }
+                            else
+                            {
+                                MessageBox.Show("Error: El valor introducido no se trata de una hora.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                                e.Cancel = true;
+                                return;
+                            }
                     }
-                    int index = dataList.IndexOf(editedLinea);
+                    int index = dataListParada.IndexOf(editedLinea);
                     if (index != -1)
                     {
-                        dataList[index] = editedLinea;
+                        dataListParada[index] = editedLinea;
                     }
                 }
             }
         }
-        
+        public static bool VerificarFormatoHora(string hora)
+        {
+
+            string patron = @"^([01]?[0-9]|2[0-3]):[0-5][0-9]$";
+            return Regex.IsMatch(hora, patron);
+        }
+        public static bool VerificarCoincidenciaCSV(string filePath, string input)
+        {
+            string[] lines = File.ReadAllLines(filePath);            
+            for (int i = 1; i < lines.Length; i++)
+            {
+                string[] columns = lines[i].Split(';');
+                if (columns.Length > 1 && columns[1].Trim().Equals(input.Trim(), StringComparison.InvariantCultureIgnoreCase))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
 
 
         private void EliminarFilaSeleccionada()
@@ -421,32 +511,61 @@ namespace Actividad2EV
         }
         public void SaveListToCSV(List<object> dataList, string filePath)
         {
-            // Crear un StringBuilder para construir el contenido del archivo CSV
+            
             StringBuilder csvContent = new StringBuilder();
 
-            // Obtener las propiedades del primer objeto en la lista
+            
             var firstItem = dataList.FirstOrDefault();
             if (firstItem != null)
             {
                 var properties = firstItem.GetType().GetProperties();
 
-                // Obtener los nombres de las propiedades y escribirlos como encabezados en la primera línea del CSV
+               
                 var headers = string.Join(";", properties.Select(p => p.Name));
                 csvContent.AppendLine(headers);
 
-                // Iterar sobre cada elemento de la lista y agregar sus valores al contenido CSV
+                
                 foreach (var item in dataList)
                 {
-                    // Obtener los valores de las propiedades del objeto y unirlos con punto y coma (;)
+                   
                     var values = string.Join(";", properties.Select(p => p.GetValue(item)?.ToString() ?? ""));
 
-                    // Agregar los valores al contenido CSV con un salto de línea al final
+                   
                     csvContent.AppendLine(values);
                 }
             }
 
-            // Escribir el contenido del archivo CSV en el archivo especificado
+           
             File.WriteAllText(filePath, csvContent.ToString());
+        }
+
+        private void dataGrid_AddingNewItem(object sender, AddingNewItemEventArgs e)
+        {
+            if (esLineas) 
+            {
+                int newId = GetLastIdFromGrid() + 1;
+
+
+                var newItem = new Linea();
+                newItem.Id = newId;
+
+                e.NewItem = newItem;
+            }
+            
+        }
+        private int GetLastIdFromGrid()
+        {
+            int lastId = 0;
+
+            foreach (var item in dataGrid.Items)
+            {
+                if (item is Linea) 
+                {
+                    var currentItem = item as Linea;
+                    lastId = Math.Max(lastId, currentItem.Id);
+                }
+            }
+            return lastId;
         }
 
     }
