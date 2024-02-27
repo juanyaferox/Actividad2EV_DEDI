@@ -44,6 +44,7 @@ namespace Actividad2EV.Models
         {
             return $"{nameof(NumLinea)}: {NumLinea}, {nameof(Municipio)}: {Municipio}, {nameof(IntervaloHS)}: {IntervaloHS}";
         }
+       
     }
 
 }

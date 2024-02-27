@@ -8,6 +8,7 @@ using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Shapes;
 
 
 namespace Actividad2EV
@@ -28,6 +29,9 @@ namespace Actividad2EV
         string filePathM;
         List<object> dataListLinea = new List<object>();
         List<object> dataListParada = new List<object>();
+
+        /*Mira profe me he esforzado como un cabrón con la parte lógica, tarde 1 semana en terminarlo y es dia 27 de febrero, 
+         * 1 mes antes de la entrega, quiero una nota bonita para subir media*/
         public MainWindow()
         {
             InitializeComponent();
@@ -36,14 +40,13 @@ namespace Actividad2EV
             filePathI = System.IO.Path.Combine(proyectoDirectorio, "Data", "Paradas.csv");
             filePathM = System.IO.Path.Combine(proyectoDirectorio, "Data", "Municipios .csv");
             PreviewKeyDown += MainWindow_PreviewKeyDown;
-            esLineas = true;
+            esLineas = true;//hago esto porque pasé de rellenar la lista al acceder a ella a hacerlo de al iniciar, para simplificar procesos
             FillDataGridCSV(filePathL);
             esItin = true;
             esLineas = false;
             FillDataGridCSV(filePathI);
             esItin = false;
-            //un poco liada aqui, pero es q al principio hice un solo metodo que me rellenase una misma lista y la fuera borrando cuando accedia al otro
-            //y para no volver a remodelar hice esta aberración
+
         }
         private void MainWindow_PreviewKeyDown(object sender, KeyEventArgs e)
         {
@@ -51,6 +54,10 @@ namespace Actividad2EV
             if (e.Key == Key.F1)
             {
                 VentanaAyuda();
+            }
+            if (e.Key == Key.F2)
+            {
+                VentanaInfo();
             }
         }
         //no es coña q el tema d botones fue lo más dolor d cabeza me dió
@@ -62,10 +69,7 @@ namespace Actividad2EV
             }
             esLineas = true;
             esItin = false;
-            if (mod)
-            {
-                dataGrid.PreparingCellForEdit += dataGrid_PreparingCellForEdit;
-            } else if (alta)
+            if (mod||alta)
             {
                 dataGrid.PreparingCellForEdit += dataGrid_PreparingCellForEdit;
             }
@@ -81,10 +85,7 @@ namespace Actividad2EV
             }
             esItin = true;
             esLineas = false;
-            if (mod)
-            {
-                dataGrid.PreparingCellForEdit -= dataGrid_PreparingCellForEdit;
-            } else if (alta)
+            if (mod||alta)
             {
                 dataGrid.PreparingCellForEdit -= dataGrid_PreparingCellForEdit;
             }
@@ -158,7 +159,14 @@ namespace Actividad2EV
                 parser.SetDelimiters(";");
 
                 parser.ReadLine();
-
+                if (esLineas && !esItin)
+                {
+                    dataListLinea.Clear();
+                }
+                else if (!esLineas && esItin)
+                {
+                    dataListParada.Clear();
+                }
                 while (!parser.EndOfData)
                 {
                     string[] fields = parser.ReadFields();
@@ -184,6 +192,7 @@ namespace Actividad2EV
         {
             Paradas paradas = ConstruirParadasDesdeCSV(fields);
             dataListParada.Add(paradas);
+
         }
         private Linea ConstruirLineaDesdeCSV(string[] fields)
         {
@@ -208,6 +217,7 @@ namespace Actividad2EV
         }
         private void dataGrid_CellEditEnding(object sender, DataGridCellEditEndingEventArgs e)
         {
+            DataGridRow row = e.Row;
             int columnIndex = e.Column.DisplayIndex;
             TextBox editedTextBox = e.EditingElement as TextBox;
             string newValue = editedTextBox.Text;
@@ -218,7 +228,7 @@ namespace Actividad2EV
             {
                 Linea editedLinea = editedObject as Linea;
                 bool coincide = VerificarCoincidenciaCSV(filePathM, newValue);
-                bool esFormatoValido = VerificarFormatoHora(newValue);
+                
                 if (editedLinea != null)
                 {
                     switch (columnIndex)
@@ -249,7 +259,7 @@ namespace Actividad2EV
                                 return;
                             }
                         case 3:
-                            
+                            bool esFormatoValido = VerificarFormatoHora(newValue);
                             if (esFormatoValido)
                             {
                                 editedLinea.HoraInic = newValue;
@@ -261,7 +271,8 @@ namespace Actividad2EV
                                 return;
                             }
                         case 4:
-                            if (esFormatoValido)
+                            bool esFormatoValido2 = VerificarFormatoHora2(newValue);
+                            if (esFormatoValido2)
                             {
                                 editedLinea.IntervaloBus = newValue;
                                 break;
@@ -290,7 +301,16 @@ namespace Actividad2EV
                         case 0:
                             try
                             {
-                                editedLinea.NumLinea = int.Parse(newValue);
+                                int newValueInt = int.Parse(newValue);
+                                if (ExisteIdParada(dataListLinea, newValueInt))
+                                {
+                                    editedLinea.NumLinea = newValueInt;
+                                }
+                                else
+                                {
+                                    MessageBox.Show("Error: La linea introducida no existe.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                                }
+                                
                             }
                             catch (FormatException)
                             {
@@ -313,7 +333,7 @@ namespace Actividad2EV
                             }
                             
                         case 2:
-                            bool esFormatoValido = VerificarFormatoHora(newValue);
+                            bool esFormatoValido = VerificarFormatoHora2(newValue);
                             if (esFormatoValido)
                             {
                                 editedLinea.IntervaloHS = newValue;
@@ -321,7 +341,7 @@ namespace Actividad2EV
                             }
                             else
                             {
-                                MessageBox.Show("Error: El valor introducido no se trata de una hora.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                                MessageBox.Show("Error: El valor introducido está en el formato correcto.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                                 e.Cancel = true;
                                 return;
                             }
@@ -334,10 +354,33 @@ namespace Actividad2EV
                 }
             }
         }
+        static bool ExisteIdParada(List<object> lista, int numero)
+        {
+            foreach (var objeto in lista)
+            {
+                
+                PropertyInfo primeraPropiedad = objeto.GetType().GetProperties()[0];
+
+                
+                object valorPrimeraPropiedad = primeraPropiedad.GetValue(objeto);
+
+                
+                if (valorPrimeraPropiedad is int && (int)valorPrimeraPropiedad == numero)
+                {
+                    return true;
+                }
+            }
+            return false; 
+        }
         public static bool VerificarFormatoHora(string hora)
         {
 
             string patron = @"^([01]?[0-9]|2[0-3]):[0-5][0-9]$";
+            return Regex.IsMatch(hora, patron);
+        }
+        public static bool VerificarFormatoHora2(string hora)
+        {
+            string patron = @"^([0-9]|[1-9][0-9]|[1-9][0-9][0-9]):[0-5][0-9]$";
             return Regex.IsMatch(hora, patron);
         }
         public static bool VerificarCoincidenciaCSV(string filePath, string input)
@@ -391,12 +434,15 @@ namespace Actividad2EV
             if (esLineas && !esItin)
             {
                 FillDataGridCSV(filePathL);
-                dataGrid.Items.Refresh();
+                dataGrid.ItemsSource = null;
+                dataGrid.ItemsSource = dataListLinea;
+                
             }
             else if (!esLineas && esItin)
             {
                 FillDataGridCSV(filePathI);
-                dataGrid.Items.Refresh();
+                dataGrid.ItemsSource = null;
+                dataGrid.ItemsSource = dataListParada;
             }
 
         }
@@ -487,27 +533,34 @@ namespace Actividad2EV
             MessageBoxResult result = MessageBox.Show("¿Estás seguro de realizar esta acción?", "Confirmación", MessageBoxButton.OKCancel);
             if (result == MessageBoxResult.OK)
             {
-                if (esLineas)
+                if (ContainsNull(dataListLinea)|| ContainsNull(dataListParada))
                 {
-                    List<object> lineasList = new List<object>();
-                    foreach (Linea linea in dataGrid.Items)
-                    {
-                        lineasList.Add(linea);
-                    }
-                    SaveListToCSV(lineasList, filePathL);
+                    MessageBox.Show("No puede haber campos con valores nulos, porfavor revise los campos","Error",0,MessageBoxImage.Error);
+                } else
+                {
+                    SaveListToCSV(dataListLinea, filePathL);
+                    SaveListToCSV(dataListParada, filePathI);
                     MessageBox.Show("Realiado con éxito");
                 }
-                else if (esItin)
+                
+            }
+        }
+        static bool ContainsNull<T>(List<T> lista)
+        {
+            foreach (var objeto in lista)
+            {
+                PropertyInfo[] propiedades = objeto.GetType().GetProperties();
+
+                foreach (var propiedad in propiedades)
                 {
-                    List<object> paradasList = new List<object>();
-                    foreach (Paradas parada in dataGrid.Items)
+                    object valor = propiedad.GetValue(objeto);
+                    if (valor == null || string.IsNullOrWhiteSpace(valor.ToString()))
                     {
-                        paradasList.Add(parada);
+                        return true;
                     }
-                    SaveListToCSV(paradasList, filePathI);
-                    MessageBox.Show("Realiado con éxito");
                 }
             }
+                return false;
         }
         public void SaveListToCSV(List<object> dataList, string filePath)
         {
@@ -568,5 +621,24 @@ namespace Actividad2EV
             return lastId;
         }
 
+        private void btnInfo_Click(object sender, RoutedEventArgs e)
+        {
+            VentanaInfo();
+        }
+
+        private void VentanaInfo()
+        {
+            string message = "Se trata de un programa de gestión de una supuesta empresa llamada AVILES." +
+                " A través de cada botón podremos visualizar en forma de datagrid los datos registrados previamente" +
+                " en el archivo CSV. Como detalles menores, el hecho de activar el botón modificar significará que podrás " +
+                "modificar las columnas ya existentes pero no las nuevas. Además, no podrás modificar el ID de las líneas," +
+                " ya que estos son autogenerados, aunque sí los de la opción itinerario. El botón alta te permite registrar" +
+                " nuevos datos pero no modificar los existentes, y de la misma manera no puedes modificar el ID de una nueva línea." +
+                " Ambas opciones no te permitirán completar la edición/registro si los datos introducidos no son válidos." +
+                " El botón de baja borrará la línea seleccionada, ten cuidado. \nEl botón refrescar volverá a obtener del CSV" +
+                " los datos del modo actual, puesto que estos no se reinician al cambiar entre opciones. " +
+                "Por último, el botón confirmar guarda los cambios realizados en el CSV si estos cumplen las condiciones.";
+            MessageBox.Show(message);
+        }
     }
 }

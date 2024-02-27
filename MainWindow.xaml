@@ -19,8 +19,9 @@
         </ResourceDictionary>
     </Window.Resources>
     <DockPanel>
-        <ToolBar DockPanel.Dock="Top" Height="26" Background="{x:Null}" HorizontalAlignment="Right">
+        <ToolBar DockPanel.Dock="Top" Height="28" Background="{x:Null}" ScrollViewer.VerticalScrollBarVisibility="Disabled" FlowDirection="RightToLeft">
             <Button Content="F1 - Ayuda" HorizontalAlignment="Right" Click="btnAyuda_Click"/>
+            <Button Content="F2 - Información" HorizontalAlignment="Right" Click="btnInfo_Click" Margin ="10,0,0,0"/>
         </ToolBar>
         <Grid>
 
@@ -33,7 +34,7 @@
                           PreparingCellForEdit="dataGrid_PreparingCellForEdit" AutoGeneratingColumn="OnAutoGeneratingColumn" 
                           BeginningEdit="dataGrid_BeginningEdit" Margin="10,-15,0,0" CellEditEnding="dataGrid_CellEditEnding"/>
             </Grid>
-            <Grid Margin="494,0,0,255" Grid.Column="1">
+            <Grid Margin="494,-8,0,255" Grid.Column="1">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="*" />
