@@ -21,7 +21,6 @@ namespace Actividad2EV
         bool esLineas;
         bool esItin;
         bool alta;
-        bool baja;
         bool mod;
         string proyectoDirectorio;
         string filePathL;
@@ -30,12 +29,10 @@ namespace Actividad2EV
         List<object> dataListLinea = new List<object>();
         List<object> dataListParada = new List<object>();
 
-        /*Mira profe me he esforzado como un cabrón con la parte lógica, tarde 1 semana en terminarlo y es dia 27 de febrero, 
-         * 1 mes antes de la entrega, quiero una nota bonita para subir media*/
         public MainWindow()
         {
             InitializeComponent();
-            proyectoDirectorio = Directory.GetParent(Environment.CurrentDirectory).Parent.Parent.FullName;
+            proyectoDirectorio = AppDomain.CurrentDomain.BaseDirectory;
             filePathL = System.IO.Path.Combine(proyectoDirectorio, "Data", "Lineas.csv");
             filePathI = System.IO.Path.Combine(proyectoDirectorio, "Data", "Paradas.csv");
             filePathM = System.IO.Path.Combine(proyectoDirectorio, "Data", "Municipios .csv");
@@ -97,7 +94,6 @@ namespace Actividad2EV
         private void btnAlta_Click(object sender, RoutedEventArgs e)
         {
             alta = true;
-            baja = false;
             mod = false;
             dataGrid.CanUserAddRows = true;
             dataGrid.IsReadOnly = false;
@@ -115,7 +111,6 @@ namespace Actividad2EV
             private void btnBaja_Click(object sender, RoutedEventArgs e)
         {
             alta = false;
-            baja = true;
             mod = false;
             try
             {
@@ -131,7 +126,6 @@ namespace Actividad2EV
         private void btnModificar_Click(object sender, RoutedEventArgs e)
         {
             alta = false;
-            baja = false;
             mod = true;
             dataGrid.CanUserAddRows = false;
             dataGrid.IsReadOnly = false;

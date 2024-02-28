@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Actividad2EV"
         mc:Ignorable="d"
-        Title="MainWindow"
+        Title="Gestor de AVILESA"
         MinWidth="822" MaxWidth="822" 
         MinHeight="520" MaxHeight="520">
     <Window.Resources>
