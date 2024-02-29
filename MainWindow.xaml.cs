@@ -1,6 +1,9 @@
 ﻿using Actividad2EV.Models;
+using CsvHelper;
+using CsvHelper.Configuration;
 using Microsoft.VisualBasic.FileIO;
 using System.ComponentModel;
+using System.Globalization;
 using System.IO;
 using System.Reflection;
 using System.Text;
@@ -8,7 +11,7 @@ using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using System.Windows.Shapes;
+
 
 
 namespace Actividad2EV
@@ -32,7 +35,16 @@ namespace Actividad2EV
         public MainWindow()
         {
             InitializeComponent();
-            proyectoDirectorio = AppDomain.CurrentDomain.BaseDirectory;
+            if (System.Diagnostics.Debugger.IsAttached) // Comprobar si se está ejecutando desde el IDE
+            {
+                proyectoDirectorio = Directory.GetParent(Environment.CurrentDirectory).Parent.Parent.FullName;
+            }
+            else // Si no se está ejecutando desde el IDE, se ejecuta desde el .exe
+            {
+                proyectoDirectorio = AppDomain.CurrentDomain.BaseDirectory;
+            }
+            //proyectoDirectorio = Directory.GetParent(Environment.CurrentDirectory).Parent.Parent.FullName;
+            //proyectoDirectorio = AppDomain.CurrentDomain.BaseDirectory;
             filePathL = System.IO.Path.Combine(proyectoDirectorio, "Data", "Lineas.csv");
             filePathI = System.IO.Path.Combine(proyectoDirectorio, "Data", "Paradas.csv");
             filePathM = System.IO.Path.Combine(proyectoDirectorio, "Data", "Municipios .csv");
@@ -532,9 +544,17 @@ namespace Actividad2EV
                     MessageBox.Show("No puede haber campos con valores nulos, porfavor revise los campos","Error",0,MessageBoxImage.Error);
                 } else
                 {
-                    SaveListToCSV(dataListLinea, filePathL);
-                    SaveListToCSV(dataListParada, filePathI);
-                    MessageBox.Show("Realiado con éxito");
+                    MessageBox.Show("Se va realizar el guardado");
+                    try
+                    {
+                        SaveListToCSV(dataListLinea, filePathL);
+                        SaveListToCSV(dataListParada, filePathI);
+                        MessageBox.Show("Realiado con éxito");
+                    }
+                    catch (UnauthorizedAccessException ex)
+                    {
+                        MessageBox.Show("No tienenes los privilegios necesario para la modificación.", "Error", 0, MessageBoxImage.Error);
+                    }
                 }
                 
             }
@@ -556,35 +576,40 @@ namespace Actividad2EV
             }
                 return false;
         }
-        public void SaveListToCSV(List<object> dataList, string filePath)
+        private void SaveListToCSV(List<object> dataList, string filePath)
         {
-            
-            StringBuilder csvContent = new StringBuilder();
-
-            
-            var firstItem = dataList.FirstOrDefault();
-            if (firstItem != null)
+            string existingHeaders = "";
+            if (File.Exists(filePath))
             {
-                var properties = firstItem.GetType().GetProperties();
-
-               
-                var headers = string.Join(";", properties.Select(p => p.Name));
-                csvContent.AppendLine(headers);
-
-                
-                foreach (var item in dataList)
+                using (var reader = new StreamReader(filePath, CsvConfig.Encoding))
                 {
-                   
-                    var values = string.Join(";", properties.Select(p => p.GetValue(item)?.ToString() ?? ""));
-
-                   
-                    csvContent.AppendLine(values);
+                    existingHeaders = reader.ReadLine();
                 }
             }
 
-           
-            File.WriteAllText(filePath, csvContent.ToString());
+            using (var writer = new StreamWriter(filePath, false, CsvConfig.Encoding))
+            using (var csvWriter = new CsvWriter(writer, CsvConfig))
+            {
+                if (string.IsNullOrEmpty(existingHeaders))
+                {
+                    csvWriter.WriteHeader(dataList.First().GetType());
+                    csvWriter.NextRecord();
+                }
+                else
+                {
+                    writer.WriteLine(existingHeaders);
+                }
+                foreach (var item in dataList)
+                {
+                    csvWriter.WriteRecord(item);
+                    csvWriter.NextRecord();
+                }
+            }
         }
+
+        public static CsvConfiguration CsvConfig =
+            new CsvConfiguration(CultureInfo.CurrentCulture)
+            { Delimiter = ";", Encoding = Encoding.UTF8 };
 
         private void dataGrid_AddingNewItem(object sender, AddingNewItemEventArgs e)
         {
@@ -632,7 +657,7 @@ namespace Actividad2EV
                 " El botón de baja borrará la línea seleccionada, ten cuidado. \nEl botón refrescar volverá a obtener del CSV" +
                 " los datos del modo actual, puesto que estos no se reinician al cambiar entre opciones. " +
                 "Por último, el botón confirmar guarda los cambios realizados en el CSV si estos cumplen las condiciones.";
-            MessageBox.Show(message);
+            MessageBox.Show(message, "Ayuda", MessageBoxButton.OK, MessageBoxImage.Information);
         }
     }
 }
