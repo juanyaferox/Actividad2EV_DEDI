@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.21.1.final using JasperReports Library version 6.21.0-4f56c4f36cd19e17675219a9ac4692d5f0f13b06  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Actividad2EV" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="3c0010c2-44ef-40a5-9a5a-bd0d0a63a90e">
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Lineas"/>
+	<queryString language="csv">
+		<![CDATA[]]>
+	</queryString>
+	<field name="Id" class="java.lang.Integer"/>
+	<field name="MunicipioOr" class="java.lang.String"/>
+	<field name="MunicipioDest" class="java.lang.String"/>
+	<field name="HoraInic" class="java.lang.String"/>
+	<field name="IntervaloBus" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="110" splitType="Stretch">
+			<image>
+				<reportElement x="0" y="16" width="89" height="79" uuid="ec96e438-1b69-411f-afe7-81435dc33c3c"/>
+				<imageExpression><![CDATA["/Image/AVILESA.png"]]></imageExpression>
+			</image>
+			<staticText>
+				<reportElement x="187" y="50" width="180" height="20" uuid="c30bb38f-d1a9-454b-aa20-7171a0108485"/>
+				<textElement textAlignment="Center"/>
+				<text><![CDATA[Informe sobre la gestión de lineas]]></text>
+			</staticText>
+		</band>
+	</title>
+	<pageHeader>
+		<band splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band height="45" splitType="Stretch">
+			<staticText>
+				<reportElement x="-11" y="10" width="91" height="20" uuid="4516bfbc-66ab-4550-99fd-b7027995a9ae">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="ee859105-d640-438d-b247-b8b3d60c8d5a"/>
+					<property name="com.jaspersoft.studio.unit.tabStopWidth" value="px"/>
+					<property name="com.jaspersoft.studio.unit.firstLineIndent" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.spacingBefore" value="px"/>
+				</reportElement>
+				<box>
+					<topPen lineWidth="1.0" lineStyle="Solid"/>
+					<leftPen lineWidth="1.0" lineStyle="Solid"/>
+					<bottomPen lineWidth="1.0" lineStyle="Solid"/>
+				</box>
+				<textElement textAlignment="Center">
+					<paragraph lineSpacingSize="1.0" spacingBefore="3" tabStopWidth="40"/>
+				</textElement>
+				<text><![CDATA[Identificador]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="100" y="10" width="100" height="20" uuid="e220adf2-1433-49b3-beea-662a6c5a91af">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="aa44445e-fba5-471e-a82a-328fd04aa983"/>
+					<property name="com.jaspersoft.studio.unit.spacingBefore" value="px"/>
+				</reportElement>
+				<box>
+					<topPen lineWidth="1.0" lineStyle="Solid"/>
+					<bottomPen lineWidth="1.0" lineStyle="Solid"/>
+				</box>
+				<textElement textAlignment="Center">
+					<paragraph spacingBefore="3"/>
+				</textElement>
+				<text><![CDATA[Municipio de origen]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="220" y="10" width="100" height="20" uuid="55044aa7-3376-469e-bdf0-54ae93a0dcea">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="0be21e35-3784-45a4-9b8d-2355ea1a9086"/>
+					<property name="com.jaspersoft.studio.unit.spacingBefore" value="px"/>
+				</reportElement>
+				<box>
+					<topPen lineWidth="1.0" lineStyle="Solid"/>
+					<bottomPen lineWidth="1.0" lineStyle="Solid"/>
+				</box>
+				<textElement textAlignment="Center">
+					<paragraph spacingBefore="3"/>
+				</textElement>
+				<text><![CDATA[Municipio de destino]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="340" y="10" width="100" height="20" uuid="66fc9f50-c15f-4ed9-81d4-520657d90c5e">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="aa7cd7f3-4a61-474a-af35-eb669c9b0894"/>
+					<property name="com.jaspersoft.studio.unit.spacingBefore" value="px"/>
+				</reportElement>
+				<box>
+					<topPen lineWidth="1.0" lineStyle="Solid"/>
+					<bottomPen lineWidth="1.0" lineStyle="Solid"/>
+				</box>
+				<textElement textAlignment="Center">
+					<paragraph spacingBefore="3"/>
+				</textElement>
+				<text><![CDATA[Hora inicial de salida]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="460" y="10" width="100" height="20" uuid="2efa4756-9887-4052-bc22-044d35b6ee82">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="ab6efe46-5348-4763-9463-ac0397f5c8ea"/>
+					<property name="com.jaspersoft.studio.unit.spacingBefore" value="px"/>
+				</reportElement>
+				<box>
+					<topPen lineWidth="1.0" lineStyle="Solid"/>
+					<bottomPen lineWidth="1.0" lineStyle="Solid"/>
+					<rightPen lineWidth="1.0" lineStyle="Solid"/>
+				</box>
+				<textElement textAlignment="Center">
+					<paragraph spacingBefore="3"/>
+				</textElement>
+				<text><![CDATA[Intervalo de buses]]></text>
+			</staticText>
+			<line>
+				<reportElement x="80" y="10" width="20" height="20" uuid="6eb65e5a-ba27-4254-8326-52f52413864b"/>
+			</line>
+			<line direction="BottomUp">
+				<reportElement x="200" y="10" width="20" height="20" uuid="8a300a6d-4a48-483e-86ed-b137cdb32817"/>
+			</line>
+			<line direction="BottomUp">
+				<reportElement x="440" y="10" width="20" height="20" uuid="1953e176-cce8-480b-8048-80c25ad55fa3"/>
+			</line>
+			<line>
+				<reportElement x="320" y="10" width="20" height="20" uuid="ef2562db-aca9-4c77-999b-c597e91e3ede"/>
+			</line>
+			<line direction="BottomUp">
+				<reportElement x="320" y="10" width="20" height="20" uuid="0aa1b241-b5de-4939-898c-bef626210ea5"/>
+			</line>
+			<line direction="BottomUp">
+				<reportElement x="80" y="10" width="20" height="20" uuid="6718c5ff-9365-4ce4-a2d8-944761c2c967"/>
+			</line>
+			<line>
+				<reportElement x="200" y="10" width="20" height="20" uuid="591b1ceb-dadc-490b-b2fd-94c27c62df37"/>
+			</line>
+			<line>
+				<reportElement x="440" y="10" width="20" height="20" uuid="dd4673ed-8479-433f-9a99-025724c149e3"/>
+			</line>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="30" splitType="Stretch">
+			<textField>
+				<reportElement x="-11" y="0" width="100" height="30" uuid="d7982ef6-ba1c-44b2-a666-8efbf67afe33">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="ee859105-d640-438d-b247-b8b3d60c8d5a"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{Id}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="100" y="0" width="100" height="30" uuid="12b1f238-38f0-4521-b290-f8805e5b9408">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="aa44445e-fba5-471e-a82a-328fd04aa983"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{MunicipioOr}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="220" y="0" width="100" height="30" uuid="20cf8f3a-1ce6-4dbd-bfd5-199a49c0e2b5">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="0be21e35-3784-45a4-9b8d-2355ea1a9086"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{MunicipioDest}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="340" y="0" width="100" height="30" uuid="1df10ca3-35c9-43a7-8970-399921136b75">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="aa7cd7f3-4a61-474a-af35-eb669c9b0894"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{HoraInic}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="460" y="0" width="100" height="30" uuid="d4d48b40-7c4b-45fc-984c-545c2b46a8c9">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="ab6efe46-5348-4763-9463-ac0397f5c8ea"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{IntervaloBus}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band height="45" splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band height="30" splitType="Stretch">
+			<textField>
+				<reportElement x="460" y="0" width="50" height="30" uuid="54cb5ffd-3eff-4bf7-8871-1497fd58bd19"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA["Página " + $V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+			<textField evaluationTime="Report">
+				<reportElement x="510" y="0" width="30" height="30" uuid="de11dcc5-4265-4702-8ecf-2a1f4c78c2f6"/>
+				<textElement textAlignment="Left"/>
+				<textFieldExpression><![CDATA[" de" + $V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageFooter>
+	<summary>
+		<band height="42" splitType="Stretch"/>
+	</summary>
+</jasperReport>
